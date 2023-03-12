@@ -5,7 +5,7 @@
 -- Conf
 -}
 
-module GetOpts (getOpts, nextRow30, nextRow90, rows, rows90, azert, ze, showRows, rule30, rule90, defaultConf) where
+module GetOpts (getOpts, nextRow30, nextRow90, nextRow110, rows, rows90, rows110, azert, ze, showRows, rule30, rule90, rule110, defaultConf) where
 
 import Text.Read ( readMaybe )
 
@@ -22,18 +22,20 @@ defaultConf = Conf {
     rule = Nothing
     ,start = Just 0
     ,line = Nothing
-    ,window = Just 0
+    ,window = Just 80
     ,move = Nothing
 }
 
 getOpts :: Conf->[String]->Maybe Conf
 getOpts conf [] = Just conf
-getOpts conf (x:y:xs) | x == "--rule" = getOpts(conf{rule = (readMaybe y)}) xs
-                      | x == "--start" = getOpts(conf{start = (readMaybe y)}) xs
-                      | x == "--lines" = getOpts(conf{line = (readMaybe y)}) xs
-                      | x == "--window" = getOpts(conf{window = (readMaybe y)}) xs
-                      | x == "--move" = getOpts(conf{move = (readMaybe y)}) xs
-                      | otherwise = Nothing
+getOpts conf ("--rule":y:xs) = getOpts(conf{rule =
+                        (readMaybe y)}) xs
+getOpts conf ("--start":y:xs) = getOpts(conf{start =
+                        (readMaybe y)}) xs
+getOpts conf ("--lines":y:xs) = getOpts(conf{line = (readMaybe y)}) xs
+getOpts conf ("--window":y:xs) = getOpts(conf{window =
+                        (readMaybe y)}) xs
+getOpts conf ("--move":y:xs) = getOpts(conf{move = (readMaybe y)}) xs
 getOpts _ _           = Nothing
 
 rule30 :: Bool -> Bool -> Bool -> Bool
@@ -49,33 +51,60 @@ rule30 True True True = False
 rule90 :: Bool -> Bool -> Bool -> Bool
 rule90 False False False = False
 rule90 False False True = True
-rule90 False True False = True
+rule90 False True False = False
 rule90 False True True = True
 rule90 True False False = True
 rule90 True False True = False
 rule90 True True False = True
 rule90 True True True = False
 
-nextRow30 :: [Bool] -> [Bool]
-nextRow30 xs = [rule30(xs !! (i-1)) (xs !! i) (xs !! (i+1)) | i <- [1..length xs - 2]]
-
-nextRow90 :: [Bool] -> [Bool]
-nextRow90 xs = [rule90(xs !! (i-1)) (xs !! i) (xs !! (i+1)) | i <- [1..length xs - 2]]
+rule110 :: Bool -> Bool -> Bool -> Bool
+rule110 False False False = False
+rule110 False False True = True
+rule110 False True False = True
+rule110 False True True = True
+rule110 True False False = False
+rule110 True False True = True
+rule110 True True False = True
+rule110 True True True = False
 
 rows :: [Bool] -> [[Bool]]
-rows xs = xs : rows(nextRow30 $ replicate padding False ++ xs ++ replicate padding False)
+rows xs = xs : rows(nextRow30 $ replicate padding False ++
+                    xs ++ replicate padding False)
           where padding = 1
 
 rows90 :: [Bool] -> [[Bool]]
-rows90 xs = xs : rows90(nextRow90 $ replicate padding False ++ xs ++ replicate padding False)
-          where padding = 1
+rows90 xs = xs : rows90(nextRow90 $ replicate padding False ++
+                        xs ++ replicate padding False)
+            where padding = 1
+
+rows110 :: [Bool] -> [[Bool]]
+rows110 xs = xs : rows110(nextRow110 $ replicate padding False ++
+                            xs ++ replicate padding False)
+            where padding = 1
+
+nextRow30 :: [Bool] -> [Bool]
+nextRow30 xs = [rule30(xs !! (i-1)) (xs !! i) (xs !! (i+1)) |
+                i <- [1..length xs - 2]]
+
+nextRow90 :: [Bool] -> [Bool]
+nextRow90 xs = [rule90(xs !! (i-1)) (xs !! i) (xs !! (i+1)) |
+                i <- [1..length xs - 2]]
+
+nextRow110 :: [Bool] -> [Bool]
+nextRow110 xs = [rule110(xs !! (i-1)) (xs !! i) (xs !! (i+1)) |
+                i <- [1..length xs - 2]]
 
 showRows :: [[Bool]] -> String
 showRows = unlines.map(map (\b -> if b then '*' else ' '))
 
 azert :: Conf -> IO ()
-azert Conf{rule = Just a} | a == 30 = putStr $ showRows $ take 20 $ rows $ replicate 41 False ++ [True] ++ replicate 40 False
-                          | a == 90 = putStr $ showRows $ take 20 $ rows90 $ replicate 51 False ++ [True] ++ replicate 50 False
+azert Conf{rule = Just a} | a == 30 = putStr $ showRows $ take 20 $ rows $
+                            replicate 41 False ++ [True] ++ replicate 40 False
+                          | a == 90 = putStr $ showRows $ take 120 $ rows90 $
+                            replicate 41 False ++ [True] ++ replicate 40 False
+                          | a == 110 = putStr $ showRows $ take 20 $ rows110 $
+                            replicate 41 False ++ [True] ++ replicate 40 False
                           | otherwise = putStr("lol")
 azert Conf{rule = Nothing} = do
     print ""
