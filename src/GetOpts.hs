@@ -5,7 +5,7 @@
 -- Conf
 -}
 
-module GetOpts (getOpts, nextRow30, nextRow90, nextRow110, rows, rows90, rows110, azert, ze, showRows, rule30, rule90, rule110, defaultConf) where
+module GetOpts (getOpts, nextRow30, nextRow90, nextRow110, rows, rows90, rows110, azert, mine, showRows, rule30, rule90, rule110, defaultConf) where
 
 import Text.Read ( readMaybe )
 
@@ -106,9 +106,8 @@ azert Conf{rule = Just a} | a == 30 = putStr $ showRows $ take 20 $ rows $
                           | a == 110 = putStr $ showRows $ take 20 $ rows110 $
                             replicate 41 False ++ [True] ++ replicate 40 False
                           | otherwise = putStr("lol")
-azert Conf{rule = Nothing} = do
-    print ""
+azert Conf{rule = Nothing} = print ""
 
-ze :: Maybe Conf -> IO ()
-ze (Just a) = azert a
-ze Nothing = print ""
+mine :: Maybe Conf -> IO ()
+mine (Just a) = azert a
+mine Nothing = print ""

@@ -14,4 +14,4 @@ main :: IO ()
 main = do 
     azer <- getArgs
     let get = getOpts defaultConf azer
-    ze get
+    mineaq²a get

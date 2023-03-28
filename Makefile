@@ -11,7 +11,7 @@ NAME	=	wolfram
 
 all:
 		stack build
-		cp $(SRC)/bin/Wolfram-exe	$(NAME)
+		cp $(SRC)/bin/Wolfram-exe	./$(NAME)
 
 fclean:
 	rm -f $(NAME)
